@@ -21,7 +21,7 @@ $$EEV = \sum (P_i \times V_i) - C$$
 
 ## 🛠 技術堆疊
 * **Backend**: Java 25 LTS, Spring Framework
-* **Frontend**: Thymeleaf, JavaScript
+* **Frontend**: Thymeleaf, JavaScript, HTML, CSS
 * **Architecture**: MVC Pattern with RESTful API
 
 ## 💡 功能亮點
