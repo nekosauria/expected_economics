@@ -1,0 +1,130 @@
+/* 響應式基礎設定 */
+:root {
+    --primary-color: #0d6efd;
+    --dark-bg: #212529;
+}
+
+body {
+    background: linear-gradient(135deg, #e8f4fd 0%, #dff0ea 40%, #f0ece8 100%);
+    background-attachment: fixed;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding-bottom: 50px;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* ── 天氣裝飾層 ── */
+body::before,
+body::after {
+    content: '';
+    position: fixed;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* 彩虹 — 左上角 */
+body::before {
+    top: -60px;
+    left: -80px;
+    width: 340px;
+    height: 340px;
+    border-radius: 50%;
+    background: transparent;
+    box-shadow:
+            0   0 0  9px rgba(248, 113, 113, 0.30),
+            0   0 0 18px rgba(251, 146,  60, 0.25),
+            0   0 0 27px rgba(251, 191,  36, 0.22),
+            0   0 0 36px rgba( 74, 222, 128, 0.20),
+            0   0 0 45px rgba( 96, 165, 250, 0.18),
+            0   0 0 54px rgba(167, 139, 250, 0.15);
+}
+
+/* 大雲朵 — 右上角，用 radial-gradient 拼 */
+body::after {
+    top: 18px;
+    right: 30px;
+    width: 160px;
+    height: 80px;
+    background:
+            radial-gradient(ellipse 55px 38px at 50% 55%, rgba(224,242,254,0.85) 100%, transparent 100%),
+            radial-gradient(ellipse 40px 30px at 22% 75%, rgba(224,242,254,0.80) 100%, transparent 100%),
+            radial-gradient(ellipse 38px 28px at 78% 75%, rgba(224,242,254,0.80) 100%, transparent 100%);
+    background-repeat: no-repeat;
+}
+
+/* 小雲朵 + 星星 — 用 .container 的偽元素補在右側 */
+.container::before {
+    content: '';
+    position: fixed;
+    top: 110px;
+    right: 20px;
+    width: 90px;
+    height: 46px;
+    pointer-events: none;
+    z-index: 0;
+    background:
+            radial-gradient(ellipse 30px 18px at 50% 50%, rgba(240,249,255,0.75) 100%, transparent 100%),
+            radial-gradient(ellipse 22px 14px at 18% 70%, rgba(240,249,255,0.70) 100%, transparent 100%),
+            radial-gradient(ellipse 20px 13px at 82% 70%, rgba(240,249,255,0.70) 100%, transparent 100%);
+    background-repeat: no-repeat;
+}
+
+/* 星星群 — 純 box-shadow 小點 */
+.container::after {
+    content: '★';
+    position: fixed;
+    top: 22px;
+    right: 210px;
+    font-size: 18px;
+    color: rgba(251, 191, 36, 0.70);
+    pointer-events: none;
+    z-index: 0;
+    text-shadow:
+            38px  12px 0 rgba(251,191, 36, 0.50),
+            72px -4px  0 rgba(251,191, 36, 0.40),
+            -28px  30px 0 rgba(251,191, 36, 0.35);
+}
+
+/* 確保主內容層疊在裝飾上方 */
+.row { position: relative; z-index: 1; }
+
+/* 確保容器在手機上不會太擠 */
+.container {
+    max-width: 900px;
+    padding: 0 15px;
+    position: relative;
+}
+
+/* 卡片美化 */
+.card {
+    border-radius: 15px !important;
+    border: none;
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 24px rgba(100, 150, 200, 0.10);
+    transition: transform 0.2s;
+}
+
+/* 結果區塊美化 */
+#result {
+    background: var(--dark-bg);
+    color: #00ff41;
+    padding: 20px;
+    border-radius: 10px;
+    min-height: 100px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 0.9rem;
+}
+
+/* RWD: 當螢幕小於 768px 時調整標題大小 */
+@media (max-width: 768px) {
+    h2 { font-size: 1.5rem; }
+    .btn { font-size: 1rem; }
+    body::before { width: 220px; height: 220px; top: -40px; left: -60px; }
+    body::after { width: 110px; right: 10px; }
+    .container::before { right: 8px; }
+    .container::after { right: 140px; font-size: 14px; }
+}

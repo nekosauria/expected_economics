@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人工成本計算器</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        .form-label { font-weight: 600; color: #495057; }
+        .result-box { background: #212529; color: #00ff41; padding: 20px; border-radius: 8px; font-family: monospace; overflow-x: auto; }
+    </style>
+</head>
+<body class="container py-5">
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">💰 人工成本與經濟效益計算器</h2>
+            <p class="text-muted">輸入參數以評估專案開發的預期經濟價值與投資報酬 (EEV & ROI)</p>
+        </div>
+
+        <div class="accordion mb-4" id="manualAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#manualContent">
+                        📖 查看完整使用說明書
+                    </button>
+                </h2>
+                <div id="manualContent" class="accordion-collapse collapse" data-bs-parent="#manualAccordion">
+                    <div class="accordion-body">
+                        <h5>📌 專案簡介</h5>
+                        <p>這是一個幫你估算軟體開發成本，並判斷專案是否值得做的工具。<br>透過 EEV 公式：<b>EV = Σ (Pi × Vi) - C</b> 進行評估。</p>
+                        <small>
+                            # EEV = (成功機率 × 成功獲利 + 失敗機率 × 失敗損失) - 總開發成本<br>
+                            # 算完平均，再扣掉成本，即可得出專案會不會賺的期望值。
+                        </small>
+                        <br>
+                        <br>
+                        <h5>🚀 使用方式</h5>
+                        <table class="table table-bordered table-sm">
+                            <thead><tr><th>方式</th><th>適合誰</th><th>入口</th></tr></thead>
+                            <tbody>
+                            <tr><td>網頁介面</td><td>PM、HR、非技術人員</td><td>/</td></tr>
+                            <tr><td>REST API</td><td>工程師、系統整合</td><td>/api/eev/calculate</td></tr>
+                            </tbody>
+                        </table>
+
+                        <h5>📊 輸入欄位與說明</h5>
+                        <table class="table table-striped table-sm">
+                            <thead><tr><th>欄位</th><th>說明</th></tr></thead>
+                            <tbody>
+                            <tr><td>月成本 (NT$)</td><td>月成本</td></tr>
+                            <tr><td>成功機率 (%)</td><td>專案順利上線並產生效益的機率</td></tr>
+                            <tr><td>成功/失敗金額</td><td>對應的預期獲利或損失金額</td></tr>
+                            </tbody>
+                        </table>
+
+                        <h5>❓ 常見問題</h5>
+                        <ul>
+                            <li><b>額外假期：</b> 填寫專案執行期間會遇到的國定假日與預估特休。</li>
+                            <li><b>成功機率預估：</b> 可參考 : 成熟技術 70-90%；一般開發 50-70%；實驗性專案 10-30%。</li>
+                            <li><b>EEV 為負值：</b> 若 EEV 為負，代表經濟上不划算，但可作為技術債償還或品牌策略等非經濟考量。</li>
+                        </ul>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-4 shadow-sm border-0">
+            <form id="calcForm" class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">專案名稱/職稱</label>
+                    <input type="text" id="title" class="form-control" placeholder="例如：影像辨識開發/RD" value="">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">備註</label>
+                    <input type="text" id="note" class="form-control" placeholder="例如：含測試與文件撰寫" value="">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">月總成本 (NT$)</label>
+                    <input type="number" id="monthly_cost" class="form-control" placeholder="例如：100000"  value="" required>
+                </div>
+                <div class="col-md-4">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">每月工作天數</label>
+                    <input type="number" id="work_days_per_month" class="form-control" placeholder="例如：22" value="22" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">每日工時 (小時)</label>
+                    <input type="number" id="work_hours_per_day" class="form-control" placeholder="例如：8" value="8" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">緩衝/額外假日</label>
+                    <input type="number" id="extra_days_off" class="form-control" placeholder="例如：0" value="" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">成功機率 (%)</label>
+                    <input type="number" id="success_chance" class="form-control" placeholder="例如：50" value="" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">成功預期收益 (NT$)</label>
+                    <input type="number" id="if_success_earn" class="form-control" placeholder="例如：300000" value="" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">失敗預期損失 (NT$)</label>
+                    <input type="number" id="if_fail_lose" class="form-control" placeholder="例如：60000" value="" required>
+                </div>
+                <div class="col-12 mt-3">
+                    <label class="form-label">🛠 工項拆解</label>
+                    <div style="background:#f8f9fa; border-radius:8px; padding:12px;">
+                        <div class="d-flex gap-2 mb-2">
+                            <span class="text-muted small flex-grow-1">工項名稱</span>
+                            <span class="text-muted small" style="width:130px">預估工時（小時）</span>
+                            <span style="width:36px"></span>
+                        </div>
+                        <div id="proj-list"></div>
+                        <button type="button" class="btn btn-outline-secondary btn-sm w-100 mt-2" onclick="addProjectRow()">
+                            + 新增工項
+                        </button>
+                    </div>
+                </div>
+
+                <div class="col-12 mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold">開始計算經濟效益</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="resultContainer" class="card mt-4 shadow-sm" style="display: none;">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">📊 評估報告：<span id="res_title"></span></h5>
+                <button class="btn btn-outline-light btn-sm" onclick="downloadCSV()">⬇ 下載 CSV</button>
+            </div>
+            <div class="card-body">
+                <div class="mt-3 p-2 bg-light border rounded">
+                    <small class="text-secondary">
+                        <strong>計算公式：</strong> <br> <span id="res_formula"></span>
+                    </small>
+                </div>
+                <br>
+                <div class="row text-center justify-content-center mb-4">
+                    <div class="col-3">
+                        <div id="res_hours" class="h5 fw-bold mb-0"></div>
+                        <small class="text-muted">總工時</small>
+                    </div>
+                    <div class="col-3">
+                        <div id="res_days" class="h5 fw-bold mb-0"></div>
+                        <small class="text-muted">總工作天</small>
+                    </div>
+                    <div class="col-3">
+                        <div id="res_cost" class="h5 fw-bold mb-0"></div>
+                        <small class="text-muted">總成本 (NT$)</small>
+                    </div>
+                    <div class="col-3">
+                        <div id="res_roi" class="h5 fw-bold text-primary mb-0"></div>
+                        <small class="text-muted">ROI 投資報酬 (%)</small>
+                    </div>
+                </div>
+
+                <div id="res_eev_box" class="alert"></div>
+
+                <h6 class="text-primary">🛠 階段拆解</h6>
+                <table class="table table-hover">
+                    <thead class="table-light">
+                    <tr>
+                        <th>專案階段</th>
+                        <th>預估工時</th>
+                        <th>預估成本</th>
+                        <th>預計完成日</th>
+                    </tr>
+                    </thead>
+                    <tbody id="res_projects_body"></tbody>
+                    <tfoot class="res_projects_foot">
+                    <tr>
+                        <td><strong><span id="res_summary_count"></span> 階段</strong></td>
+                        <td><strong id="res_summary_hours"></strong></td>
+                        <td><strong id="res_summary_cost"></strong></td>
+                        <td><strong id="res_summary_date"></strong></td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <br>
+        <h4 class="mt-5 mb-3 text-secondary">計算結果回饋：</h4>
+        <pre id="result" class="result-box shadow-sm">等待輸入並執行計算...</pre>
+
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/api.js"></script>
+</body>
+</html>
