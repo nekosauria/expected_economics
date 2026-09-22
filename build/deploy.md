@@ -34,7 +34,7 @@ After=network.target
 
 [Service]
 Type=simple
-User=teddylai
+User=teddy
 WorkingDirectory=/opt/ee
 ExecStart=java -Xms256m -Xmx512m \
 -jar /opt/ee/ee-1.0.0.jar \
